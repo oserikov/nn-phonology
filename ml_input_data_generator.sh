@@ -1,3 +1,4 @@
- sh_scripts/lexemes_generator.sh |\
- sh_scripts/phonemes_sequences_extractor.sh |\
- sh_scripts/turkish_onehot_encoder.sh
+export PYTHONIOENCODING="UTF-8"
+sh_scripts/lexemes_generator.sh |\
+sh_scripts/phonemes_sequences_extractor.sh |\
+sh_scripts/turkish_onehot_encoder.sh
