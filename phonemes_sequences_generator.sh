@@ -1,0 +1,2 @@
+python3 py_scripts/phonemes_sequences_generator.py
+
