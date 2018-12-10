@@ -16,15 +16,8 @@ def create_xor_instances(num_rounds=2000):
     return questions, answers
 
 
-def get_xor_training_data():
+def get_training_data():
     return create_xor_instances(10000)
-
-
-def generate_xor_training_data_to_file():
-    questions, answers = create_xor_instances()
-    with open('xor_training_data.txt', 'w') as f:
-        for question, answer in zip(questions, answers):
-            print("".join([str(q) for q in question]), "".join([str(a) for a in answer]), file=f)
 
 
 def init_model(input_dim, hidden_num, output_dim):
@@ -45,23 +38,40 @@ def init_model(input_dim, hidden_num, output_dim):
     return input_l, hidden_l, output_l, model
 
 
-def read_training_lines(lines_iter):
+def generate_xor_training_data_to_file():
+    questions, answers = create_xor_instances()
+    with open('xor_training_data.txt', 'w') as f:
+        for question, answer in zip(questions, answers):
+            print("".join([str(q) for q in question]), "".join([str(a) for a in answer]), file=f)
+
+
+def read_training_data_from_file(filename):
+    with open(filename) as f:
+        words = []
+        word = []
+        for line in f.readlines():
+            if line.strip() == "":
+                words.append(word)
+                word = []
+            else:
+                word.append([[int(c) for c in elem] for elem in line.rstrip().split(' ')])
+        words.append(word)
+
+    return words
+
+
+def read_from_stdin():
     words = []
     word = []
-    for line in lines_iter:
+    for line in sys.stdin:
         if line.strip() == "":
             words.append(word)
             word = []
         else:
             word.append([[int(c) for c in elem] for elem in line.rstrip().split(' ')])
-    words.append(word)
+
     return list(filter(None, words))
 
+if __name__ == "__main__":
+    generate_xor_training_data_to_file()
 
-def read_training_data_from_file(filename):
-    with open(filename) as f:
-        return read_training_lines(f.readlines())
-
-
-def read_from_stdin():
-    return read_training_lines(sys.stdin)
