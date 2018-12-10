@@ -13,7 +13,7 @@ def get_all_seqs_of_phonemes(lexemes, length_of_phonemes_seq):
     seqs = []
     for lexeme in lexemes:
         seqs += get_all_substrings(lexeme, length_of_phonemes_seq)
-
+        seqs.append("")
     return seqs
 
 
