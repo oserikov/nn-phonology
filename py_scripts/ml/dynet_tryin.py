@@ -37,7 +37,7 @@ def train_ml():
     input_dim = len(training_data[0][0][0])
     output_dim = len(training_data[0][0][1])
     model_input_l, hidden_l, model_output_l, model = init_model(input_dim, HIDDEN_NUM, output_dim)
-    trainer = dy.AdamTrainer(model)#, learning_rate=0.1)#, learning_rate_max=0.001, learning_rate_min=0.00001)
+    trainer = dy.CyclicalSGDTrainer(model)#, learning_rate=0.1)#, learning_rate_max=0.001, learning_rate_min=0.00001)
 
     # global big_loss, batch_loss, letter, loss
     for i in range(num_of_epochs):
@@ -110,7 +110,7 @@ def train_ml():
         plt.plot(names_1, values_1, "C0+")
 
 
-for i in range(10):
+for i in range(2):
     train_ml()
     plt.savefig('plots/plot' + str(i) + '.png')
 
