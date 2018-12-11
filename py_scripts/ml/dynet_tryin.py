@@ -14,7 +14,7 @@ HIDDEN_NUM = 2
 training_data = read_training_data_from_file('tmp.txt')
 random.shuffle(training_data)
 # training_data = training_data[:600]
-num_of_epochs = 20
+num_of_epochs = 60
 training_subset_size = 600
 
 alphabet = []
@@ -37,7 +37,7 @@ def train_ml():
     input_dim = len(training_data[0][0][0])
     output_dim = len(training_data[0][0][1])
     model_input_l, hidden_l, model_output_l, model = init_model(input_dim, HIDDEN_NUM, output_dim)
-    trainer = dy.MomentumSGDTrainer(model, learning_rate = 0.0005)#, learning_rate_max=0.001, learning_rate_min=0.00001)
+    trainer = dy.AdamTrainer(model)#, learning_rate_max=0.001, learning_rate_min=0.00001)
 
     # global big_loss, batch_loss, letter, loss
     for i in range(num_of_epochs):
