@@ -66,8 +66,8 @@ def train_ml():
 
             big_loss.extend(batch_loss)
             j += 1
-
-            print(j)
+            if (j % 100 == 2):
+                print(j)
         print(trainer.learning_rate, (dy.esum(big_loss) / len(big_loss)).npvalue())
         trainer.learning_rate = trainer.learning_rate*0.8
 
