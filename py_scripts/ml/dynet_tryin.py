@@ -12,8 +12,10 @@ HIDDEN_NUM = 2
 
 
 training_data = read_training_data_from_file('tmp.txt')
-num_of_epochs = 10
-training_subset_size = 800
+random.shuffle(training_data)
+# training_data = training_data[:600]
+num_of_epochs = 20
+training_subset_size = 600
 
 alphabet = []
 with open(r"data/tur_alphabet_wiki.txt", encoding='utf-8') as f:
@@ -35,7 +37,7 @@ def train_ml():
     input_dim = len(training_data[0][0][0])
     output_dim = len(training_data[0][0][1])
     model_input_l, hidden_l, model_output_l, model = init_model(input_dim, HIDDEN_NUM, output_dim)
-    trainer = dy.SimpleSGDTrainer(model, learning_rate = 0.005)#, learning_rate_max=0.001, learning_rate_min=0.00001)
+    trainer = dy.MomentumSGDTrainer(model, learning_rate = 0.0005)#, learning_rate_max=0.001, learning_rate_min=0.00001)
 
     # global big_loss, batch_loss, letter, loss
     for i in range(num_of_epochs):
@@ -62,9 +64,9 @@ def train_ml():
 
             # dy.esum(batch_loss).backward()
             trainer.update()
-
             big_loss.extend(batch_loss)
 
+        # trainer.learning_rate *= 0.8
         print(trainer.learning_rate, (dy.esum(big_loss) / len(big_loss)).npvalue())
         # trainer.learning_rate = trainer.learning_rate*0.8
 
