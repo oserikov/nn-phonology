@@ -43,7 +43,8 @@ def train_ml():
     for i in range(num_of_epochs):
         random.shuffle(training_data)
         big_loss = []
-        for word in training_data[:training_subset_size]:
+        training_data_subset = training_data[:training_subset_size]
+        for word in training_data_subset:
             batch_loss = []
             last_letter = [0] * input_dim
             for letter in word:
@@ -101,8 +102,7 @@ def train_ml():
             values_0.append(hidden_0_dict[name])
             values_1.append(hidden_1_dict[name])
 
-    print(names_0[-len(vovels)])
-    if (np.mean(values_0[-len(vovels)]) < np.mean(values_1[-len(vovels)])):
+    if (np.mean(values_0[-len(vovels):]) < np.mean(values_1[-len(vovels):])):
         plt.plot(names_0, values_0, "C0+")
         plt.plot(names_1, values_1, "C1o")
     else:
