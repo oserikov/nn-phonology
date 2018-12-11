@@ -12,7 +12,7 @@ HIDDEN_NUM = 2
 
 
 training_data = read_training_data_from_file('tmp.txt')
-num_of_epochs = 10
+num_of_epochs = 20
 training_subset_size = 800
 
 alphabet = []
@@ -35,7 +35,7 @@ def train_ml():
     input_dim = len(training_data[0][0][0])
     output_dim = len(training_data[0][0][1])
     model_input_l, hidden_l, model_output_l, model = init_model(input_dim, HIDDEN_NUM, output_dim)
-    trainer = dy.MomentumSGDTrainer(model, learning_rate=0.0005)
+    trainer = dy.SimpleSGDTrainer(model, learning_rate = 0.005)#, learning_rate_max=0.001, learning_rate_min=0.00001)
 
     # global big_loss, batch_loss, letter, loss
     for i in range(num_of_epochs):
@@ -65,7 +65,8 @@ def train_ml():
             trainer.update()
 
             big_loss.extend(batch_loss)
-        print((dy.esum(big_loss) / len(big_loss)).npvalue())
+        print(trainer.learning_rate, (dy.esum(big_loss) / len(big_loss)).npvalue())
+        trainer.learning_rate = trainer.learning_rate*0.8
 
     names_0 = []
     names_1 = []
