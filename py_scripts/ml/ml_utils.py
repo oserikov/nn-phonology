@@ -30,7 +30,7 @@ def init_model(input_dim, hidden_num, output_dim):
 
     input_l = dy.vecInput(input_dim)
 
-    hidden_l = dy.zeros(hidden_num)
+    hidden_l = dy.random_normal(hidden_num)
     hidden_l = dy.logistic((V * input_l) + hidden_l)
 
     output_l = U * hidden_l
