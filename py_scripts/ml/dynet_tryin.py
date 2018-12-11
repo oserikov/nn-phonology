@@ -1,8 +1,8 @@
 import random
 import matplotlib.pyplot as plt
 
-# import dynet_config
-# dynet_config.set(mem=4096)
+import dynet_config
+dynet_config.set_gpu()
 
 import dynet as dy
 
