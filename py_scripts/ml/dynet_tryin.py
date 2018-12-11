@@ -39,7 +39,7 @@ def train_ml():
 
     # global big_loss, batch_loss, letter, loss
     for i in range(num_of_epochs):
-
+        j = 0
         random.shuffle(training_data)
         big_loss = []
         for word in list(filter(None, training_data[:training_subset_size])):
@@ -65,6 +65,9 @@ def train_ml():
             trainer.update()
 
             big_loss.extend(batch_loss)
+            j += 1
+
+            print(j)
         print(trainer.learning_rate, (dy.esum(big_loss) / len(big_loss)).npvalue())
         trainer.learning_rate = trainer.learning_rate*0.8
 
