@@ -60,9 +60,12 @@ def train_ml():
                 loss = dy.pickneglogsoftmax(model_output_l, target)
                 batch_loss.append(loss)
                 last_letter = letter[1]
-                loss.backward()
+                # loss.backward()
 
             # dy.esum(batch_loss).backward()
+            loss = dy.esum(batch_loss)
+            loss.forward()
+            loss.backward()
             trainer.update()
             big_loss.extend(batch_loss)
 
