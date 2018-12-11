@@ -1,6 +1,6 @@
 import random
 import matplotlib.pyplot as plt
-
+import numpy as np
 # import dynet_config
 # dynet_config.set_gpu()
 
@@ -11,11 +11,11 @@ from ml_utils import init_model, read_from_stdin, read_training_data_from_file
 HIDDEN_NUM = 2
 
 
-training_data = read_training_data_from_file('tmp.txt')
+training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
 random.shuffle(training_data)
 # training_data = training_data[:600]
 num_of_epochs = 100
-training_subset_size = 600
+training_subset_size = 500
 
 alphabet = []
 with open(r"data/tur_alphabet_wiki.txt", encoding='utf-8') as f:
@@ -37,13 +37,13 @@ def train_ml():
     input_dim = len(training_data[0][0][0])
     output_dim = len(training_data[0][0][1])
     model_input_l, hidden_l, model_output_l, model = init_model(input_dim, HIDDEN_NUM, output_dim)
-    trainer = dy.MomentumSGDTrainer(model, learning_rate=0.0005)#, learning_rate_max=0.001, learning_rate_min=0.00001)
+    trainer = dy.AdamTrainer(model)#, learning_rate=0.1)#, learning_rate_max=0.001, learning_rate_min=0.00001)
 
     # global big_loss, batch_loss, letter, loss
     for i in range(num_of_epochs):
         random.shuffle(training_data)
         big_loss = []
-        for word in list(filter(None, training_data[:training_subset_size])):
+        for word in training_data[:training_subset_size]:
             batch_loss = []
             last_letter = [0] * input_dim
             for letter in word:
@@ -60,16 +60,17 @@ def train_ml():
                 loss = dy.pickneglogsoftmax(model_output_l, target)
                 batch_loss.append(loss)
                 last_letter = letter[1]
-                # loss.backward()
+                loss.backward()
 
             # dy.esum(batch_loss).backward()
-            loss = dy.esum(batch_loss)
-            loss.forward()
-            loss.backward()
-            trainer.update()
+            # loss = dy.esum(batch_loss)
+            # loss.forward()
+            # loss.backward()
+
+                trainer.update()
             big_loss.extend(batch_loss)
 
-        # trainer.learning_rate *= 0.8
+        # trainer.learning_rate *= 0.9
         print(trainer.learning_rate, (dy.esum(big_loss) / len(big_loss)).npvalue())
         # trainer.learning_rate = trainer.learning_rate*0.8
 
@@ -100,8 +101,13 @@ def train_ml():
             values_0.append(hidden_0_dict[name])
             values_1.append(hidden_1_dict[name])
 
-    plt.plot(names_0, values_0, "C0")
-    plt.plot(names_1, values_1, "C1")
+    print(names_0[-len(vovels)])
+    if (np.mean(values_0[-len(vovels)]) < np.mean(values_1[-len(vovels)])):
+        plt.plot(names_0, values_0, "C0+")
+        plt.plot(names_1, values_1, "C1o")
+    else:
+        plt.plot(names_0, values_0, "C1o")
+        plt.plot(names_1, values_1, "C0+")
 
 
 for i in range(10):

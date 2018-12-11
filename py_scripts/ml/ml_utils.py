@@ -25,8 +25,8 @@ def init_model(input_dim, hidden_num, output_dim):
 
     model = dy.ParameterCollection()
 
-    V = model.add_parameters((hidden_num, input_dim))
-    U = model.add_parameters((output_dim, hidden_num))
+    V = model.add_parameters((hidden_num, input_dim), init='normal')
+    U = model.add_parameters((output_dim, hidden_num), init='normal')
 
     input_l = dy.vecInput(input_dim)
 
