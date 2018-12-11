@@ -14,7 +14,7 @@ HIDDEN_NUM = 2
 training_data = read_training_data_from_file('tmp.txt')
 random.shuffle(training_data)
 # training_data = training_data[:600]
-num_of_epochs = 60
+num_of_epochs = 100
 training_subset_size = 600
 
 alphabet = []
