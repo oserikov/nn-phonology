@@ -101,6 +101,6 @@ def train_ml(num_of_epochs=10):
 plt.ylim(0, 1)
 initial_num_of_epochs = 10
 for i in range(10):
-    num_of_epochs = (2 ** (i + 1))
+    num_of_epochs = (2 ** (i + 2))
     train_ml(num_of_epochs)
     plt.savefig('plots/plot' + str(i) + '.png')
