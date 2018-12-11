@@ -12,7 +12,7 @@ HIDDEN_NUM = 2
 
 
 training_data = read_training_data_from_file('tmp.txt')
-num_of_epochs = 20
+num_of_epochs = 10
 training_subset_size = 800
 
 alphabet = []
@@ -39,7 +39,6 @@ def train_ml():
 
     # global big_loss, batch_loss, letter, loss
     for i in range(num_of_epochs):
-        j = 0
         random.shuffle(training_data)
         big_loss = []
         for word in list(filter(None, training_data[:training_subset_size])):
@@ -65,11 +64,9 @@ def train_ml():
             trainer.update()
 
             big_loss.extend(batch_loss)
-            j += 1
-            if (j % 100 == 2):
-                print(j)
+
         print(trainer.learning_rate, (dy.esum(big_loss) / len(big_loss)).npvalue())
-        trainer.learning_rate = trainer.learning_rate*0.8
+        # trainer.learning_rate = trainer.learning_rate*0.8
 
     names_0 = []
     names_1 = []
