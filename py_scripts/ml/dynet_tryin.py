@@ -44,7 +44,17 @@ def train_ml(num_of_epochs=10):
         random.shuffle(training_data)
         epoch_losses = []
         training_data_subset = training_data[:training_subset_size]
+        val_data_subset = training_data[training_subset_size:]
         for word in training_data_subset:
+            for letter in word:
+                model_input_l.set(letter[0])
+                target = letter[1].index(1)
+
+                loss = -dy.log(dy.pick(dy.softmax(model_output_l), target))
+                loss.backward()
+                trainer.update()
+
+        for word in val_data_subset:
             batch_loss = []
             for letter in word:
                 model_input_l.set(letter[0])
@@ -52,9 +62,6 @@ def train_ml(num_of_epochs=10):
 
                 loss = -dy.log(dy.pick(dy.softmax(model_output_l), target))
                 batch_loss.append(loss)
-                loss.backward()
-                trainer.update()
-
             epoch_losses.extend(batch_loss)
         print("epoch " + str(i))
         print("learning_rate:", trainer.learning_rate)
