@@ -28,7 +28,7 @@ training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
 random.shuffle(training_data)
 # training_data = training_data[:600]
 
-training_subset_size = 100
+training_subset_size = 600
 
 alphabet = []
 with open(r"data/tur_alphabet_wiki.txt", encoding='utf-8') as f:
