@@ -128,9 +128,12 @@ def train_ml(num_of_epochs=10):
     print(names)
 
     for row in range(HIDDEN_NUM):
-        plt.ylim(-1, 1)
-
+        plt.ylim(-1.2, 1.2)
         plt.plot(names, values[row], "o")
+
+        labels = names
+        for x, y in zip(names, values[row]):
+            plt.annotate(x, xy=(x, y+0.05))
 
         plt.savefig(PLOTS_DIRNAME + '/unit_' + str(row) + '_e' + str(num_of_epochs) + '.png')
 
