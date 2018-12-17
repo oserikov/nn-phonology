@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
+
 import random
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
 import os
-# import dynet_config
-# dynet_config.set_gpu()
 
 import dynet as dy
 
@@ -24,17 +25,19 @@ if not os.path.exists(PLOTS_DIRNAME):
 
 print("HIDDEN LAYERS NUM: " + str(HIDDEN_NUM))
 
-training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
+training_data = list(filter(None, read_from_stdin()))  #list(filter(None, read_training_data_from_file('tmp.txt')))
 random.shuffle(training_data)
 # training_data = training_data[:600]
 
-training_subset_size = 600
+training_subset_size = 1100
+
+print(len(training_data))
 
 alphabet = []
 with open(r"data/tur_alphabet_wiki.txt", encoding='utf-8') as f:
     alphabet = [l.strip() for l in f]
 vovels = [c for c in "aeiıoöüu"]
-consonants = set(alphabet).difference(set(vovels))
+consonants = sorted(set(alphabet).difference(set(vovels)))
 
 
 def onehot_encode_char(alphabet, char):
@@ -44,73 +47,97 @@ def onehot_encode_char(alphabet, char):
 
 
 def train_ml(num_of_epochs=10):
-    # loss = dy.scalarInput(0)
-    # batch_loss = []
-    # epoch_losses = []
-
     input_dim = len(training_data[0][0][0])
     output_dim = len(training_data[0][0][1])
-    model_input_l, hidden_l, model_output_l, model = init_model(input_dim, HIDDEN_NUM, output_dim)
+    layers = 1
+
+    model = dy.ParameterCollection()
+
+    rnn = dy.SimpleRNNBuilder(layers, input_dim, HIDDEN_NUM, model)
+    R = model.add_parameters((output_dim, HIDDEN_NUM))
+
     trainer = dy.MomentumSGDTrainer(model)
 
     for i in range(num_of_epochs):
         random.shuffle(training_data)
         epoch_losses = []
+
         training_data_subset = training_data[:training_subset_size]
         val_data_subset = training_data[training_subset_size:]
+
         for word in training_data_subset:
+            dy.renew_cg()
+            s = rnn.initial_state()
+
+            batch_loss = []
+
             for letter in word:
-                model_input_l.set(letter[0])
+                s = s.add_input(dy.inputVector(letter[0]))
                 target = letter[1].index(1)
 
-                loss = -dy.log(dy.pick(dy.softmax(model_output_l), target))
-                loss.backward()
-                trainer.update()
+                loss = dy.pickneglogsoftmax(R * s.output(), target)
+                batch_loss.append(loss)
+
+            batch_loss = dy.esum(batch_loss)
+            batch_loss.backward()
+            trainer.update()
 
         for word in val_data_subset:
+            dy.renew_cg()
+            s = rnn.initial_state()
+
             batch_loss = []
             for letter in word:
-                model_input_l.set(letter[0])
+                s = s.add_input(dy.inputVector(letter[0]))
                 target = letter[1].index(1)
 
-                loss = -dy.log(dy.pick(dy.softmax(model_output_l), target))
-                batch_loss.append(loss)
+                loss = dy.pickneglogsoftmax(R * s.output(), target)
+                batch_loss.append(loss.npvalue())
+
             epoch_losses.extend(batch_loss)
-        print("epoch " + str(i))
-        print("learning_rate:", trainer.learning_rate)
-        print("epoch avg loss:", (dy.esum(epoch_losses) / len(epoch_losses)).npvalue()[0])
-        print("epoch max loss:", dy.emax(epoch_losses).npvalue()[0])
-        print("===")
-        # trainer.learning_rate = trainer.learning_rate*0.8
+
+        print("epoch " + str(i) + ", epoch avg loss:", np.mean(epoch_losses))
 
     names = []
-    values = [[] for i in range(HIDDEN_NUM)]
+    values = [[] for _ in range(HIDDEN_NUM)]
 
-    hidden_dict = [{} for i in range(HIDDEN_NUM)]
+    hidden_dict = [{} for _ in range(HIDDEN_NUM)]
 
     for letter in alphabet:
-        model_input_l.set([int(bit) for bit in onehot_encode_char(alphabet, letter)])
+        dy.renew_cg()
+        s = rnn.initial_state()
+
+        s = s.add_input(dy.inputVector(
+            [int(bit) for bit in onehot_encode_char(alphabet, letter)])
+        )
+
+        output = s.output()
         for i in range(HIDDEN_NUM):
-            hidden_dict[i][letter] = hidden_l.npvalue()[i]
+            hidden_dict[i][letter] = output.npvalue()[i]
 
     for name in consonants:
-        names.append(name)
+        names.append(r'$\mathit{'+name+'}$')
         for i in range(HIDDEN_NUM):
             values[i].append(hidden_dict[i][name])
 
     for name in vovels:
-        names.append(name)
+        names.append(r'$\mathit{' + name + '}$')
         for i in range(HIDDEN_NUM):
             values[i].append(hidden_dict[i][name])
 
+    print(names)
+
     for row in range(HIDDEN_NUM):
-        plt.ylim(0, 1)
+        plt.ylim(-1, 1)
+
         plt.plot(names, values[row], "o")
+
         plt.savefig(PLOTS_DIRNAME + '/unit_' + str(row) + '_e' + str(num_of_epochs) + '.png')
+
         plt.clf()
 
 
-initial_num_of_epochs = 10
-for i in range(10):
-    num_of_epochs = (10 * (i + 1))
-    train_ml(num_of_epochs)
+matplotlib.rc('font', **{'sans-serif' : 'Arial',
+                         'family' : 'sans-serif'})
+
+train_ml(300)

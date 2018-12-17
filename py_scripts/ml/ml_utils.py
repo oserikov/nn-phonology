@@ -20,6 +20,9 @@ def get_training_data():
     return create_xor_instances(10000)
 
 
+# def init_model_v2(input_dim, hidden_num, output_dim):
+
+
 def init_model(input_dim, hidden_num, output_dim):
     dy.renew_cg()
 
@@ -27,11 +30,11 @@ def init_model(input_dim, hidden_num, output_dim):
 
     V = model.add_parameters((hidden_num, input_dim), init='normal')
     U = model.add_parameters((output_dim, hidden_num), init='normal')
-
+    W = model.add_parameters((hidden_num, hidden_num), init='normal')
     input_l = dy.vecInput(input_dim)
 
     hidden_l = dy.random_normal(hidden_num)
-    hidden_l = dy.logistic((V * input_l) + hidden_l)
+    hidden_l = dy.logistic((V * input_l) + W * hidden_l)
 
     output_l = U * hidden_l
 
