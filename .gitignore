@@ -216,3 +216,7 @@ pip-selfcheck.json
 data/apertium-tur-master
 letters.txt
 idea/
+
+py_scripts/ml/*.txt
+*.png
+plots/*.png
