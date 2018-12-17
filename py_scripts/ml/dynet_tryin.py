@@ -137,7 +137,4 @@ def train_ml(num_of_epochs=10):
         plt.clf()
 
 
-matplotlib.rc('font', **{'sans-serif' : 'Arial',
-                         'family' : 'sans-serif'})
-
 train_ml(1000)
