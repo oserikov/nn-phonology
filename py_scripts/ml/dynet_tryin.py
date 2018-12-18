@@ -56,7 +56,7 @@ def train_ml(num_of_epochs=10):
     rnn = dy.SimpleRNNBuilder(layers, input_dim, HIDDEN_NUM, model)
     R = model.add_parameters((output_dim, HIDDEN_NUM))
 
-    trainer = dy.MomentumSGDTrainer(model)
+    trainer = dy.MomentumSGDTrainer(model, learning_rate=0.001)
 
     for i in range(num_of_epochs):
         random.shuffle(training_data)
@@ -99,12 +99,6 @@ def train_ml(num_of_epochs=10):
         epoch_avg_loss = np.mean(epoch_losses)
         print("epoch " + str(i) + ", epoch avg loss:", epoch_avg_loss)
 
-        if epoch_avg_loss < 1.95:
-            trainer.learning_rate *= 0.8
-        elif epoch_avg_loss < 2.3:
-            trainer.learning_rate *= 0.5
-        elif epoch_avg_loss > 2.6:
-            trainer.learning_rate = 0.01
 
 
     names = []
