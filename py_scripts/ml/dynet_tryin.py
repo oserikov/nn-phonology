@@ -54,7 +54,7 @@ def train_ml(num_of_epochs=10):
     model = dy.ParameterCollection()
 
     rnn = dy.SimpleRNNBuilder(layers, input_dim, HIDDEN_NUM, model)
-    R = model.add_parameters((output_dim, HIDDEN_NUM))
+    R = model.add_parameters((output_dim, HIDDEN_NUM), init='normal')
 
     trainer = dy.MomentumSGDTrainer(model, learning_rate=0.001)
 
@@ -100,7 +100,6 @@ def train_ml(num_of_epochs=10):
         print("epoch " + str(i) + ", epoch avg loss:", epoch_avg_loss)
 
 
-
     names = []
     values = [[] for _ in range(HIDDEN_NUM)]
 
@@ -128,13 +127,10 @@ def train_ml(num_of_epochs=10):
         for i in range(HIDDEN_NUM):
             values[i].append(hidden_dict[i][name])
 
-    print(names)
-
     for row in range(HIDDEN_NUM):
         plt.ylim(-1.2, 1.2)
         plt.plot(names, values[row], "o")
 
-        labels = names
         for x, y in zip(names, values[row]):
             plt.annotate(x, xy=(x, y+0.05))
 
@@ -143,4 +139,4 @@ def train_ml(num_of_epochs=10):
         plt.clf()
 
 
-train_ml(1000)
+train_ml(10000)
