@@ -96,7 +96,16 @@ def train_ml(num_of_epochs=10):
 
             epoch_losses.extend(batch_loss)
 
-        print("epoch " + str(i) + ", epoch avg loss:", np.mean(epoch_losses))
+        epoch_avg_loss = np.mean(epoch_losses)
+        print("epoch " + str(i) + ", epoch avg loss:", epoch_avg_loss)
+
+        if epoch_avg_loss < 1.95:
+            trainer.learning_rate *= 0.8
+        elif epoch_avg_loss < 2.3:
+            trainer.learning_rate *= 0.5
+        elif epoch_avg_loss > 2.6:
+            trainer.learning_rate = 0.01
+
 
     names = []
     values = [[] for _ in range(HIDDEN_NUM)]
