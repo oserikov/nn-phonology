@@ -11,6 +11,8 @@ import dynet as dy
 
 from ml_utils import init_model, read_from_stdin, read_training_data_from_file
 
+ORDERED_ALPHABET = "abcçdefgğhıijklmnoöprsştuüvyz"
+
 HIDDEN_NUM = 2
 if len(sys.argv) > 1:
     try:
@@ -117,15 +119,19 @@ def train_ml(num_of_epochs=10):
         for i in range(HIDDEN_NUM):
             hidden_dict[i][letter] = output.npvalue()[i]
 
-    for name in consonants:
-        names.append(r'$\mathit{'+name+'}$')
-        for i in range(HIDDEN_NUM):
-            values[i].append(hidden_dict[i][name])
 
-    for name in vovels:
+    for name in ORDERED_ALPHABET:
         names.append(r'$\mathit{' + name + '}$')
         for i in range(HIDDEN_NUM):
             values[i].append(hidden_dict[i][name])
+
+    # for name in consonants:
+    #
+    #
+    # for name in vovels:
+    #     names.append(r'$\mathit{' + name + '}$')
+    #     for i in range(HIDDEN_NUM):
+    #         values[i].append(hidden_dict[i][name])
 
     for row in range(HIDDEN_NUM):
         plt.ylim(-1.2, 1.2)
