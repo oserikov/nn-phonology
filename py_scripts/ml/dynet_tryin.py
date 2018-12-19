@@ -58,7 +58,7 @@ def train_ml(num_of_epochs=10):
     rnn = dy.SimpleRNNBuilder(layers, input_dim, HIDDEN_NUM, model)
     R = model.add_parameters((output_dim, HIDDEN_NUM), init='normal')
 
-    trainer = dy.MomentumSGDTrainer(model, learning_rate=0.001)
+    trainer = dy.MomentumSGDTrainer(model, learning_rate=0.0001)
 
     for i in range(num_of_epochs):
         random.shuffle(training_data)
