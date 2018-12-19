@@ -11,6 +11,8 @@ import dynet as dy
 
 from ml_utils import init_model, read_from_stdin, read_training_data_from_file
 
+ORDERED_ALPHABET = "abcçdefgğhıijklmnoöprsştuüvyz"
+
 HIDDEN_NUM = 2
 if len(sys.argv) > 1:
     try:
@@ -54,9 +56,9 @@ def train_ml(num_of_epochs=10):
     model = dy.ParameterCollection()
 
     rnn = dy.SimpleRNNBuilder(layers, input_dim, HIDDEN_NUM, model)
-    R = model.add_parameters((output_dim, HIDDEN_NUM))
+    R = model.add_parameters((output_dim, HIDDEN_NUM), init='normal')
 
-    trainer = dy.MomentumSGDTrainer(model)
+    trainer = dy.MomentumSGDTrainer(model, learning_rate=0.0001)
 
     for i in range(num_of_epochs):
         random.shuffle(training_data)
@@ -96,7 +98,9 @@ def train_ml(num_of_epochs=10):
 
             epoch_losses.extend(batch_loss)
 
-        print("epoch " + str(i) + ", epoch avg loss:", np.mean(epoch_losses))
+        epoch_avg_loss = np.mean(epoch_losses)
+        print("epoch " + str(i) + ", epoch avg loss:", epoch_avg_loss)
+
 
     names = []
     values = [[] for _ in range(HIDDEN_NUM)]
@@ -115,23 +119,24 @@ def train_ml(num_of_epochs=10):
         for i in range(HIDDEN_NUM):
             hidden_dict[i][letter] = output.npvalue()[i]
 
-    for name in consonants:
-        names.append(r'$\mathit{'+name+'}$')
-        for i in range(HIDDEN_NUM):
-            values[i].append(hidden_dict[i][name])
 
-    for name in vovels:
+    for name in ORDERED_ALPHABET:
         names.append(r'$\mathit{' + name + '}$')
         for i in range(HIDDEN_NUM):
             values[i].append(hidden_dict[i][name])
 
-    print(names)
+    # for name in consonants:
+    #
+    #
+    # for name in vovels:
+    #     names.append(r'$\mathit{' + name + '}$')
+    #     for i in range(HIDDEN_NUM):
+    #         values[i].append(hidden_dict[i][name])
 
     for row in range(HIDDEN_NUM):
         plt.ylim(-1.2, 1.2)
         plt.plot(names, values[row], "o")
 
-        labels = names
         for x, y in zip(names, values[row]):
             plt.annotate(x, xy=(x, y+0.05))
 
@@ -140,4 +145,4 @@ def train_ml(num_of_epochs=10):
         plt.clf()
 
 
-train_ml(1000)
+train_ml(10000)

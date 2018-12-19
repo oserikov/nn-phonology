@@ -3,47 +3,47 @@
 The simple RNN with single hidden layer was learned to predict the next letter in the turkic word given the current letter. 
 The number of neurons in the hidden layer was varying from 2 to 5. The hidden layer activation function is *htan*, the loss is computed via the negative log of the of the softmax output layer.
 
-The network is easily learned to distinguish vovels and consonants using a hidden unit.
+The network is easily learned to distinguish vowels and consonants using a hidden unit.
 
 The network is able to distinguish the letter *j* which actually isn't native for turkish.
 
-It is now unclear for me whether the network has learned the vovel or consonants harmony as it was described in the [paper](http://www.aclweb.org/anthology/W97-1012).
+It is now unclear for me whether the network has learned the vowel or consonants harmony as it was described in the [paper](http://www.aclweb.org/anthology/W97-1012).
 
 #### 2 units in hidden layer
 ##### Hidden unit 0 activation
-![activation.png](plots/2_hidden_l/unit_0_e1000.png?raw=true "hidden unit 0 activation")
+![activation.png](plots/2_hidden_l/unit_0_e10000.png?raw=true "hidden unit 0 activation")
 ##### Hidden unit 1 activation
-![activation.png](plots/2_hidden_l/unit_1_e1000.png?raw=true "hidden unit 1 activation")
+![activation.png](plots/2_hidden_l/unit_1_e10000.png?raw=true "hidden unit 1 activation")
 
 #### 3 units in hidden layer
 ##### Hidden unit 0 activation
-![activation.png](plots/3_hidden_l/unit_0_e1000.png?raw=true "hidden unit 0 activation")
+![activation.png](plots/3_hidden_l/unit_0_e10000.png?raw=true "hidden unit 0 activation")
 ##### Hidden unit 1 activation
-![activation.png](plots/3_hidden_l/unit_1_e1000.png?raw=true "hidden unit 1 activation")
+![activation.png](plots/3_hidden_l/unit_1_e10000.png?raw=true "hidden unit 1 activation")
 ##### Hidden unit 2 activation
-![activation.png](plots/3_hidden_l/unit_2_e1000.png?raw=true "hidden unit 2 activation")
+![activation.png](plots/3_hidden_l/unit_2_e10000.png?raw=true "hidden unit 2 activation")
 
 #### 4 units in hidden layer
 ##### Hidden unit 0 activation
-![activation.png](plots/4_hidden_l/unit_0_e1000.png?raw=true "hidden unit 0 activation")
+![activation.png](plots/4_hidden_l/unit_0_e10000.png?raw=true "hidden unit 0 activation")
 ##### Hidden unit 1 activation
-![activation.png](plots/4_hidden_l/unit_1_e1000.png?raw=true "hidden unit 1 activation")
+![activation.png](plots/4_hidden_l/unit_1_e10000.png?raw=true "hidden unit 1 activation")
 ##### Hidden unit 2 activation
-![activation.png](plots/4_hidden_l/unit_2_e1000.png?raw=true "hidden unit 2 activation")
+![activation.png](plots/4_hidden_l/unit_2_e10000.png?raw=true "hidden unit 2 activation")
 ##### Hidden unit 3 activation
-![activation.png](plots/4_hidden_l/unit_3_e1000.png?raw=true "hidden unit 3 activation")
+![activation.png](plots/4_hidden_l/unit_3_e10000.png?raw=true "hidden unit 3 activation")
 
 #### 5 units in hidden layer
 ##### Hidden unit 0 activation
-![activation.png](plots/5_hidden_l/unit_0_e1000.png?raw=true "hidden unit 0 activation")
+![activation.png](plots/5_hidden_l/unit_0_e10000.png?raw=true "hidden unit 0 activation")
 ##### Hidden unit 1 activation
-![activation.png](plots/5_hidden_l/unit_1_e1000.png?raw=true "hidden unit 1 activation")
+![activation.png](plots/5_hidden_l/unit_1_e10000.png?raw=true "hidden unit 1 activation")
 ##### Hidden unit 2 activation
-![activation.png](plots/5_hidden_l/unit_2_e1000.png?raw=true "hidden unit 2 activation")
+![activation.png](plots/5_hidden_l/unit_2_e10000.png?raw=true "hidden unit 2 activation")
 ##### Hidden unit 3 activation
-![activation.png](plots/5_hidden_l/unit_3_e1000.png?raw=true "hidden unit 3 activation")
+![activation.png](plots/5_hidden_l/unit_3_e10000.png?raw=true "hidden unit 3 activation")
 ##### Hidden unit 4 activation
-![activation.png](plots/5_hidden_l/unit_4_e1000.png?raw=true "hidden unit 4 activation")
+![activation.png](plots/5_hidden_l/unit_4_e10000.png?raw=true "hidden unit 4 activation")
 
 ## usage
 * clone and cd to the project 

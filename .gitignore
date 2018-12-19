@@ -218,5 +218,3 @@ letters.txt
 idea/
 
 py_scripts/ml/*.txt
-*.png
-plots/*.png
