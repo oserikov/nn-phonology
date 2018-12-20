@@ -11,8 +11,6 @@ import matplotlib.pyplot as plt
 from ml_utils import init_model, read_from_stdin, read_training_data_from_file
 
 
-torch.manual_seed(1)
-
 HIDDEN_NUM = 2
 if len(sys.argv) > 1:
     try:
@@ -22,13 +20,17 @@ if len(sys.argv) > 1:
 
 PLOTS_DIRNAME = os.path.join("plots", str(HIDDEN_NUM) + "_hidden_l")
 
+if not os.path.exists(PLOTS_DIRNAME):
+    os.makedirs(PLOTS_DIRNAME)
+
+print("HIDDEN LAYERS NUM: " + str(HIDDEN_NUM))
+
 # noinspection PyUnresolvedReferences
 dtype = torch.FloatTensor
 
 EPOCHS = 1000
 SEQ_LENGTH = 20
 LEARNING_RATE = 0.001
-HIDDEN_NUM=2
 
 
 DATA_TIME_STEPS = np.linspace(2, 10, SEQ_LENGTH + 1)
@@ -76,7 +78,8 @@ def forward(input, context_units_state, w1, w2):
 
 # noinspection PyUnresolvedReferences
 def train(num_of_epochs):
-    input_size, output_size = 31, 29
+    input_size = len(training_data[0][0][0]) + HIDDEN_NUM
+    output_size = len(training_data[0][0][1])
 
     V = torch.FloatTensor(input_size, HIDDEN_NUM).type(dtype)
     init.normal_(V, 0.0, 0.4)
