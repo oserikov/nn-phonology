@@ -27,7 +27,8 @@ if not os.path.exists(PLOTS_DIRNAME):
 
 print("HIDDEN LAYERS NUM: " + str(HIDDEN_NUM))
 
-training_data = list(filter(None, read_from_stdin()))  #list(filter(None, read_training_data_from_file('tmp.txt')))
+training_data = list(filter(None, read_from_stdin()))
+# training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
 random.shuffle(training_data)
 # training_data = training_data[:600]
 
@@ -140,9 +141,9 @@ def train_ml(num_of_epochs=10):
         for x, y in zip(names, values[row]):
             plt.annotate(x, xy=(x, y+0.05))
 
-        plt.savefig(PLOTS_DIRNAME + '/unit_' + str(row) + '_e' + str(num_of_epochs) + '.png')
+        plt.savefig(PLOTS_DIRNAME + '/unit_' + str(row) + '_e' + str(num_of_epochs) + 'dynet.png')
 
         plt.clf()
 
 
-train_ml(10000)
+train_ml(1000)
