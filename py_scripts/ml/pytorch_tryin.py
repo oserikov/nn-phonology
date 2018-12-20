@@ -28,7 +28,7 @@ print("HIDDEN LAYERS NUM: " + str(HIDDEN_NUM))
 # noinspection PyUnresolvedReferences
 dtype = torch.FloatTensor
 
-EPOCHS = 1000
+EPOCHS = 500
 SEQ_LENGTH = 20
 LEARNING_RATE = 0.001
 
@@ -71,7 +71,7 @@ loss = nn.CrossEntropyLoss()
 # noinspection PyUnresolvedReferences
 def forward(input, context_units_state, w1, w2):
     xh = torch.cat((input, context_units_state), 1)
-    context_units_state = torch.tanh(xh.mm(w1))
+    context_units_state = torch.sigmoid(xh.mm(w1))
     out = context_units_state.mm(w2)
     return (out, context_units_state)
 
@@ -151,7 +151,7 @@ def train(num_of_epochs):
             values[i].append(hidden_dict[i][name])
 
     for row in range(HIDDEN_NUM):
-        plt.ylim(-1.2, 1.2)
+        plt.ylim(-0.2, 1.2)
         plt.plot(names, values[row], "o")
 
         for x, y in zip(names, values[row]):
