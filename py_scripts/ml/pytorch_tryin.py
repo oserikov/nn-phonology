@@ -10,7 +10,6 @@ import torch.nn.init as init
 import matplotlib.pyplot as plt
 from ml_utils import init_model, read_from_stdin, read_training_data_from_file
 
-
 HIDDEN_NUM = 2
 if len(sys.argv) > 1:
     try:
@@ -30,12 +29,7 @@ dtype = torch.FloatTensor
 
 EPOCHS = 500
 SEQ_LENGTH = 20
-LEARNING_RATE = 0.001
-
-
-DATA_TIME_STEPS = np.linspace(2, 10, SEQ_LENGTH + 1)
-DATA = np.sin(DATA_TIME_STEPS)
-DATA.resize((SEQ_LENGTH + 1, 1))
+LEARNING_RATE = 0.0001
 
 training_data = list(filter(None, read_from_stdin()))
 # training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
@@ -56,24 +50,15 @@ def onehot_encode_char(alphabet, char):
     return onehot_encoding_char
 
 
-x = Variable(torch.Tensor(DATA[:-1]).type(dtype), requires_grad=False)
-y = Variable(torch.Tensor(DATA[1:]).type(dtype), requires_grad=False)
+crossEntropyLoss = nn.CrossEntropyLoss()
 
-
-input = torch.randn(3,3, requires_grad=True)
-target = torch.empty(3, dtype=torch.long).random_(5)
-print(input)
-print(target)
-loss = nn.CrossEntropyLoss()
-
-# print(DATA)
 
 # noinspection PyUnresolvedReferences
 def forward(input, context_units_state, w1, w2):
     xh = torch.cat((input, context_units_state), 1)
     context_units_state = torch.sigmoid(xh.mm(w1))
     out = context_units_state.mm(w2)
-    return (out, context_units_state)
+    return out, context_units_state
 
 
 # noinspection PyUnresolvedReferences
@@ -82,13 +67,15 @@ def train(num_of_epochs):
     output_size = len(training_data[0][0][1])
 
     V = torch.FloatTensor(input_size, HIDDEN_NUM).type(dtype)
-    init.normal_(V, 0.0, 0.4)
+    init.normal_(V)
     V = Variable(V, requires_grad=True)
 
     # noinspection PyUnresolvedReferences
     W = torch.FloatTensor(HIDDEN_NUM, output_size).type(dtype)
-    init.normal_(W, 0.0, 0.3)
+    init.normal_(W)
     W = Variable(W, requires_grad=True)
+
+    trainer = torch.optim.SGD((V, W), lr=LEARNING_RATE, momentum=0.9)
 
     for i in range(num_of_epochs):
         random.shuffle(training_data)
@@ -103,33 +90,36 @@ def train(num_of_epochs):
         context_state = Variable(torch.zeros((1, HIDDEN_NUM)).type(dtype), requires_grad=True)
 
         for word in training_data_subset:
-
-            batch_pred = []
-            batch_target = []
-
-
             for letter in word:
                 input = Variable(torch.Tensor([letter[0]]).type(dtype), requires_grad=False)
                 target = Variable(torch.Tensor([letter[1].index(1)]).type(torch.LongTensor), requires_grad=False)
 
-                (pred, context_state) = forward(input, context_state, V, W)
-                batch_pred.append(pred)
-                batch_target.append(target)
-
+                output, context_state = forward(input, context_state, V, W)
                 context_state = Variable(context_state.data)
 
-                output = loss(pred, target)  # (pred - target).pow(2).sum() / 2
-                output.backward()
-                total_loss.append(output.item())
+                loss = crossEntropyLoss(output, target)
+                loss.backward()
 
-            V.data -= LEARNING_RATE * V.grad.data
-            W.data -= LEARNING_RATE * W.grad.data
+            trainer.step()
+            trainer.zero_grad()
 
-            V.grad.data.zero_()
-            W.grad.data.zero_()
+        for word in val_data_subset:
+            batch_loss = []
+            for letter in word:
+                input = Variable(torch.Tensor([letter[0]]).type(dtype), requires_grad=False)
+                target = Variable(torch.Tensor([letter[1].index(1)]).type(torch.LongTensor), requires_grad=False)
 
-        print("epoch {}, epoch avg loss: {}".format(i, np.mean(total_loss)))
+                output, context_state = forward(input, context_state, V, W)
+                context_state = Variable(context_state.data)
 
+                loss = crossEntropyLoss(output, target)
+                batch_loss.append(loss.item())
+
+            epoch_losses.extend(batch_loss)
+
+        epoch_avg_loss = np.mean(epoch_losses)
+
+        print("epoch {}, epoch avg loss: {}".format(i, np.mean(epoch_avg_loss)))
 
     names = []
     values = [[] for _ in range(HIDDEN_NUM)]
@@ -140,7 +130,7 @@ def train(num_of_epochs):
 
         input = Variable(torch.Tensor([[int(bit) for bit in onehot_encode_char(alphabet, letter)]]))
 
-        (pred, context_state) = forward(input, context_state, V, W)
+        (output, context_state) = forward(input, context_state, V, W)
 
         for i in range(HIDDEN_NUM):
             hidden_dict[i][letter] = context_state.detach().numpy()[0][i]
@@ -155,7 +145,7 @@ def train(num_of_epochs):
         plt.plot(names, values[row], "o")
 
         for x, y in zip(names, values[row]):
-            plt.annotate(x, xy=(x, y+0.05))
+            plt.annotate(x, xy=(x, y + 0.05))
 
         plt.savefig(PLOTS_DIRNAME + '/unit_' + str(row) + '_e' + str(num_of_epochs) + 'torch.png')
 
