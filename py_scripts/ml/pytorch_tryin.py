@@ -8,7 +8,7 @@ import os
 import torch.nn as nn
 import torch.nn.init as init
 import matplotlib.pyplot as plt
-from ml_utils import init_model, read_from_stdin, read_training_data_from_file
+from py_scripts.ml.ml_utils import *
 
 HIDDEN_NUM = 2
 if len(sys.argv) > 1:
@@ -27,12 +27,11 @@ print("HIDDEN LAYERS NUM: " + str(HIDDEN_NUM))
 # noinspection PyUnresolvedReferences
 dtype = torch.FloatTensor
 
-EPOCHS = 500
-SEQ_LENGTH = 20
-LEARNING_RATE = 0.0001
+EPOCHS = 100
+LEARNING_RATE = 0.01
 
-training_data = list(filter(None, read_from_stdin()))
-# training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
+# training_data = list(filter(None, read_from_stdin()))
+training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
 random.shuffle(training_data)
 training_subset_size = 1100
 
@@ -56,13 +55,14 @@ crossEntropyLoss = nn.CrossEntropyLoss()
 # noinspection PyUnresolvedReferences
 def forward(input, context_units_state, w1, w2):
     xh = torch.cat((input, context_units_state), 1)
-    context_units_state = torch.sigmoid(xh.mm(w1))
+    context_units_state = torch.tanh(xh.mm(w1))
     out = context_units_state.mm(w2)
     return out, context_units_state
 
 
 # noinspection PyUnresolvedReferences
 def train(num_of_epochs):
+    global LEARNING_RATE
     input_size = len(training_data[0][0][0]) + HIDDEN_NUM
     output_size = len(training_data[0][0][1])
 
@@ -80,6 +80,13 @@ def train(num_of_epochs):
     for i in range(num_of_epochs):
         random.shuffle(training_data)
         epoch_losses = []
+
+        if i == 20 or i == 50:
+            print("кусь")
+            for param_group in trainer.param_groups:
+                LEARNING_RATE = LEARNING_RATE / 10
+                param_group['lr'] = LEARNING_RATE
+
 
         training_data_subset = training_data[:training_subset_size]
         val_data_subset = training_data[training_subset_size:]
@@ -130,7 +137,9 @@ def train(num_of_epochs):
 
         input = Variable(torch.Tensor([[int(bit) for bit in onehot_encode_char(alphabet, letter)]]))
 
+        # context_state = Variable(torch.zeros((1, HIDDEN_NUM)).type(dtype), requires_grad=True)
         (output, context_state) = forward(input, context_state, V, W)
+        # context_state = Variable(context_state.data)
 
         for i in range(HIDDEN_NUM):
             hidden_dict[i][letter] = context_state.detach().numpy()[0][i]
@@ -141,7 +150,7 @@ def train(num_of_epochs):
             values[i].append(hidden_dict[i][name])
 
     for row in range(HIDDEN_NUM):
-        plt.ylim(-0.2, 1.2)
+        plt.ylim(-1.2, 1.2)
         plt.plot(names, values[row], "o")
 
         for x, y in zip(names, values[row]):
