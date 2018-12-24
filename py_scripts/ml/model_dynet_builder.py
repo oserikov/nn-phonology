@@ -16,7 +16,7 @@ class ModelDyNetBuilder:
 
         self._rnn = dy.SimpleRNNBuilder(self.LAYERS, self._input_dim, self._hidden_dim, self._model)
         self._rnn.disable_dropout()
-        self._W = self._model.add_parameters((self._output_dim, self._hidden_dim), init='normal')
+        self._W = self._model.add_parameters((self._output_dim, self._hidden_dim), init=dy.NormalInitializer())
 
         self._learning_rate = learning_rate
         self._trainer = dy.MomentumSGDTrainer(self._model, learning_rate=self._learning_rate)
