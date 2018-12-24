@@ -81,7 +81,7 @@ class ModelDyNet:
 
     def _init_layers(self):
         self._input_l = dy.vecInput(self._input_dim + self._hidden_dim)
-        self._context_l = dy.logistic(self._V * self._input_l + self._b)
+        self._context_l = dy.tanh(self._V * self._input_l + self._b)
         self._output_l = self._W * self._context_l
 
     def get_context_state(self):
