@@ -31,7 +31,7 @@ class ModelDyNet:
         predictions = []
         for input_vector, target_vector in training_vectors:
             pred = dy.softmax(self._forward(input_vector))
-            loss = -dy.tanh(dy.pick(pred, target_vector.index(1)))
+            loss = -dy.log(dy.pick(pred, target_vector.index(1)))
             batch_loss.append(loss)
             predictions.append(pred.npvalue())
 
@@ -81,7 +81,7 @@ class ModelDyNet:
 
     def _init_layers(self):
         self._input_l = dy.vecInput(self._input_dim + self._hidden_dim)
-        self._context_l = dy.tanh(self._V * self._input_l + self._b)
+        self._context_l = dy.logistic(self._V * self._input_l + self._b)
         self._output_l = self._W * self._context_l
 
     def get_context_state(self):
