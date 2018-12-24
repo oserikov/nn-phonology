@@ -14,10 +14,10 @@ class ModelDyNet:
         self._hidden_dim = hidden_dim
         self._output_dim = output_dim
 
-        self._V = self._model.add_parameters((self._hidden_dim, self._input_dim + self._hidden_dim), init=dy.NormalInitializer())
+        self._V = self._model.add_parameters((self._hidden_dim, self._input_dim + self._hidden_dim), init=dy.GlorotInitializer())
         # noinspection PyRedundantParentheses
         self._b = self._model.add_parameters((self._hidden_dim), init=dy.ConstInitializer(0))
-        self._W = self._model.add_parameters((self._output_dim, self._hidden_dim), init=dy.NormalInitializer())
+        self._W = self._model.add_parameters((self._output_dim, self._hidden_dim), init=dy.GlorotInitializer())
 
         self._context_state_vector = dy.random_normal(hidden_dim).npvalue()
 

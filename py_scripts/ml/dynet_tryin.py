@@ -46,8 +46,8 @@ def onehot_encode_char(alphabet, char):
     return onehot_encoding_char
 
 
-learning_rate = 0.001
-EPOCHS = 100
+learning_rate = 0.0001
+EPOCHS = 1000
 model_type = "dynet_hands"
 # model_type = "dynet_build"
 # model_type = "torch_hands"
@@ -95,7 +95,7 @@ def plot_ml(model):
     for row in range(HIDDEN_NUM):
         ax = plt.subplot(111)
 
-        ax.set_ylim([-1.1, 1.05])
+        ax.set_ylim([-0.1, 1.05])
         for i, name, value in zip(range(len(names)), names, values[row]):
             if name[-3] in vowels:
                 ax.plot(i, value, "o", mfc='none', color='C0')
