@@ -14,8 +14,10 @@ class ModelDyNet:
         self._hidden_dim = hidden_dim
         self._output_dim = output_dim
 
-        self._V = self._model.add_parameters((self._hidden_dim, self._input_dim + self._hidden_dim), init='normal')
-        self._W = self._model.add_parameters((self._output_dim, self._hidden_dim), init='normal')
+        self._V = self._model.add_parameters((self._hidden_dim, self._input_dim + self._hidden_dim), init=dy.NormalInitializer())
+        # noinspection PyRedundantParentheses
+        self._b = self._model.add_parameters((self._hidden_dim), init=dy.ConstInitializer(0))
+        self._W = self._model.add_parameters((self._output_dim, self._hidden_dim), init=dy.NormalInitializer())
 
         self._context_state_vector = dy.random_normal(hidden_dim).npvalue()
 
@@ -29,7 +31,7 @@ class ModelDyNet:
         predictions = []
         for input_vector, target_vector in training_vectors:
             pred = dy.softmax(self._forward(input_vector))
-            loss = -dy.log(dy.pick(pred, target_vector.index(1)))
+            loss = -dy.tanh(dy.pick(pred, target_vector.index(1)))
             batch_loss.append(loss)
             predictions.append(pred.npvalue())
 
@@ -79,7 +81,7 @@ class ModelDyNet:
 
     def _init_layers(self):
         self._input_l = dy.vecInput(self._input_dim + self._hidden_dim)
-        self._context_l = dy.logistic(self._V * self._input_l)
+        self._context_l = dy.logistic(self._V * self._input_l + self._b)
         self._output_l = self._W * self._context_l
 
     def get_context_state(self):

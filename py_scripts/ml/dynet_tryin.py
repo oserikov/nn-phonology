@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 
 from py_scripts.ml.ml_utils import read_training_data_from_file, read_from_stdin
 from py_scripts.ml.model_dynet import ModelDyNet
+from py_scripts.ml.model_dynet_builder import ModelDyNetBuilder
 from py_scripts.ml.model_pytorch import ModelPyTorch
 
 
@@ -32,8 +33,8 @@ HIDDEN_NUM, PLOTS_DIR_NAME = initialize_hidden_num()
 
 print("HIDDEN LAYERS NUM: " + str(HIDDEN_NUM))
 
-training_data = list(filter(None, read_from_stdin()))
-# training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
+# training_data = list(filter(None, read_from_stdin()))
+training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
 random.shuffle(training_data)
 
 training_subset_size = 1100
@@ -45,11 +46,24 @@ def onehot_encode_char(alphabet, char):
     return onehot_encoding_char
 
 
+learning_rate = 0.001
+EPOCHS = 100
+model_type = "dynet_hands"
+# model_type = "dynet_build"
+# model_type = "torch_hands"
+
+
 def train_ml(num_of_epochs=10):
     input_dim = len(training_data[0][0][0])
     output_dim = len(training_data[0][0][1])
 
-    model = ModelPyTorch(input_dim, HIDDEN_NUM, output_dim, learning_rate=0.0001)
+
+    if model_type == "dynet_hands":
+        model = ModelDyNet(input_dim, HIDDEN_NUM, output_dim, learning_rate=learning_rate)
+    if model_type == "dynet_build":
+        model = ModelDyNetBuilder(input_dim, HIDDEN_NUM, output_dim, learning_rate=learning_rate)
+    if model_type == "torch_hands":
+        model = ModelPyTorch(input_dim, HIDDEN_NUM, output_dim, learning_rate=learning_rate)
 
     for i in range(num_of_epochs):
         random.shuffle(training_data)
@@ -81,7 +95,7 @@ def plot_ml(model):
     for row in range(HIDDEN_NUM):
         ax = plt.subplot(111)
 
-        ax.set_ylim([-0.1, 1.05])
+        ax.set_ylim([-1.1, 1.05])
         for i, name, value in zip(range(len(names)), names, values[row]):
             if name[-3] in vowels:
                 ax.plot(i, value, "o", mfc='none', color='C0')
@@ -116,4 +130,4 @@ def get_units_activation_levels(alphabet, model):
     return hidden_dict
 
 
-plot_ml(train_ml(10000))
+plot_ml(train_ml(EPOCHS))
