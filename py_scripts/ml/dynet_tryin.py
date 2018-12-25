@@ -33,11 +33,11 @@ HIDDEN_NUM, PLOTS_DIR_NAME = initialize_hidden_num()
 
 print("HIDDEN LAYERS NUM: " + str(HIDDEN_NUM))
 
-# training_data = list(filter(None, read_from_stdin()))
-training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
+training_data = list(filter(None, read_from_stdin()))
+# training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
 random.shuffle(training_data)
 
-training_subset_size = 1100
+training_subset_size = 400
 
 
 def onehot_encode_char(alphabet, char):
@@ -46,10 +46,10 @@ def onehot_encode_char(alphabet, char):
     return onehot_encoding_char
 
 
-learning_rate = 0.001
+learning_rate = 0.01
 EPOCHS = 100
-# model_type = "dynet_hands"
-model_type = "dynet_build"
+model_type = "dynet_hands"
+# model_type = "dynet_build"
 # model_type = "torch_hands"
 
 
@@ -71,8 +71,8 @@ def train_ml(num_of_epochs=10):
         training_data_subset = training_data[:training_subset_size]
         val_data_subset = training_data[training_subset_size:]
 
-        _, epoch_loss = model.train_batches(training_data_subset)
-        # _, epoch_loss = model.predict_batches(val_data_subset)
+        model.train_batches(training_data_subset)
+        _, epoch_loss = model.predict_batches(val_data_subset)
         print("epoch " + str(i) + ", epoch avg loss:", epoch_loss)
 
     return model

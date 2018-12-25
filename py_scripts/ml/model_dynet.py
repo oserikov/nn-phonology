@@ -24,7 +24,7 @@ class ModelDyNet:
         self._learning_rate = learning_rate
         self._trainer = dy.MomentumSGDTrainer(self._model, learning_rate=self._learning_rate)
 
-        self._l2_param = 0.00006
+        self._l2_param = 0.0005
 
         self._init_layers()
 
