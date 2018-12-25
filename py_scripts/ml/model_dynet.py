@@ -23,7 +23,7 @@ class ModelDyNet:
 
         self._learning_rate = learning_rate
         self._trainer = dy.MomentumSGDTrainer(self._model, learning_rate=self._learning_rate)
-
+        self._l2_param = 0.00006
         self._init_layers()
 
     def _batch_forward(self, training_vectors):
@@ -31,7 +31,7 @@ class ModelDyNet:
         predictions = []
         for input_vector, target_vector in training_vectors:
             pred = dy.softmax(self._forward(input_vector))
-            loss = -dy.log(dy.pick(pred, target_vector.index(1)))
+            loss = -dy.log(dy.pick(pred, target_vector.index(1))) + self._l2_param * dy.squared_norm(self._W) + self._l2_param * dy.squared_norm(self._V)
             batch_loss.append(loss)
             predictions.append(pred.npvalue())
 
