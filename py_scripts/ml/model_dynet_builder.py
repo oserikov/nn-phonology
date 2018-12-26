@@ -21,7 +21,8 @@ class ModelDyNetBuilder:
         self._learning_rate = learning_rate
         self._trainer = dy.MomentumSGDTrainer(self._model, learning_rate=self._learning_rate)
 
-        self._l2_param = 0.0005
+        self._l1_param = 0.00
+        self._l2_param = 0.0001
 
         self._init_layers()
 
@@ -30,9 +31,11 @@ class ModelDyNetBuilder:
         predictions = []
         for input_vector, target_vector in training_vectors:
             pred = dy.softmax(self._forward(input_vector))
-
-            loss = -dy.log(dy.pick(pred, target_vector.index(1))) \
-                   + self._l2_param * sum([dy.squared_norm(param) for param in self._model.parameters_list()])
+            l1_reg_value = sum([dy.sum_elems(dy.abs(param)) for param in self._model.parameters_list()])
+            l2_reg_value = sum([dy.squared_norm(param) for param in self._model.parameters_list()])
+            loss = -dy.log(dy.pick(pred, target_vector.index(1)))\
+                    + self._l1_param * l1_reg_value \
+                    + self._l2_param * l2_reg_value
             batch_loss.append(loss)
             predictions.append(pred.npvalue())
 

@@ -46,10 +46,10 @@ def onehot_encode_char(alphabet, char):
     return onehot_encoding_char
 
 
-learning_rate = 0.01
+learning_rate = 0.001
 EPOCHS = 100
-model_type = "dynet_hands"
-# model_type = "dynet_build"
+# model_type = "dynet_hands"
+model_type = "dynet_build"
 # model_type = "torch_hands"
 
 
