@@ -7,9 +7,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 
 from py_scripts.ml.ml_utils import read_training_data_from_file, read_from_stdin
-from py_scripts.ml.model_dynet import ModelDyNet
 from py_scripts.ml.model_dynet_builder import ModelDyNetBuilder
-from py_scripts.ml.model_pytorch import ModelPyTorch
 
 
 def initialize_hidden_num():
@@ -30,14 +28,13 @@ def initialize_hidden_num():
 
 
 HIDDEN_NUM, PLOTS_DIR_NAME = initialize_hidden_num()
-
 print("HIDDEN LAYERS NUM: " + str(HIDDEN_NUM))
 
-# training_data = list(filter(None, read_from_stdin()))
-training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
+training_data = list(filter(None, read_from_stdin()))
+# training_data = list(filter(None, read_training_data_from_file('tmp.txt')))
 random.shuffle(training_data)
 
-training_subset_size = 1100
+training_subset_size = int(len(training_data) * 0.8)
 
 
 def onehot_encode_char(alphabet, char):
@@ -47,23 +44,14 @@ def onehot_encode_char(alphabet, char):
 
 
 learning_rate = 0.001
-EPOCHS = 100
-# model_type = "dynet_hands"
-model_type = "dynet_build"
-# model_type = "torch_hands"
+EPOCHS = 500
 
 
 def train_ml(num_of_epochs=10):
     input_dim = len(training_data[0][0][0])
     output_dim = len(training_data[0][0][1])
 
-
-    if model_type == "dynet_hands":
-        model = ModelDyNet(input_dim, HIDDEN_NUM, output_dim, learning_rate=learning_rate)
-    if model_type == "dynet_build":
-        model = ModelDyNetBuilder(input_dim, HIDDEN_NUM, output_dim, learning_rate=learning_rate)
-    if model_type == "torch_hands":
-        model = ModelPyTorch(input_dim, HIDDEN_NUM, output_dim, learning_rate=learning_rate)
+    model = ModelDyNetBuilder(input_dim, HIDDEN_NUM, output_dim, learning_rate=learning_rate)
 
     for i in range(num_of_epochs):
         random.shuffle(training_data)
@@ -71,8 +59,8 @@ def train_ml(num_of_epochs=10):
         training_data_subset = training_data[:training_subset_size]
         val_data_subset = training_data[training_subset_size:]
 
-        _, epoch_loss = model.train_batches(training_data_subset)
-        # _, epoch_loss = model.predict_batches(val_data_subset)
+        model.train_batches(training_data_subset)
+        _, epoch_loss = model.predict_batches(val_data_subset)
         print("epoch " + str(i) + ", epoch avg loss:", epoch_loss)
 
     return model
@@ -95,7 +83,7 @@ def plot_ml(model):
     for row in range(HIDDEN_NUM):
         ax = plt.subplot(111)
 
-        ax.set_ylim([-0.1, 1.05])
+        ax.set_ylim([-1.1, 1.05])
         for i, name, value in zip(range(len(names)), names, values[row]):
             if name[-3] in vowels:
                 ax.plot(i, value, "o", mfc='none', color='C0')
@@ -121,13 +109,18 @@ def get_alphabet_and_vowels():
 
 
 def get_units_activation_levels(alphabet, model):
-    hidden_dict = [{} for _ in range(HIDDEN_NUM)]
-    for letter in alphabet:
-        onehot_encoded_letter = [int(bit) for bit in onehot_encode_char(alphabet, letter)]
-        model.predict_batches([[[onehot_encoded_letter, [1] * len(onehot_encoded_letter)]]])
-        for i in range(HIDDEN_NUM):
-            hidden_dict[i][letter] = model.get_context_state()[i]
-    return hidden_dict
+    hidden_dict = [{key: [] for key in alphabet} for _ in range(HIDDEN_NUM)]
+
+    for batch in training_data:
+        for entry in batch:
+            model.predict_batches([[entry]])
+            letter = alphabet[entry[0].index(1)]
+            for i in range(HIDDEN_NUM):
+                hidden_dict[i][letter].append(model.get_context_state()[i])
+
+    import numpy as np
+
+    return [{key: np.mean(hidden_dict[i][key]) for key in hidden_dict[i].keys()} for i in range(len(hidden_dict))]
 
 
 plot_ml(train_ml(EPOCHS))
